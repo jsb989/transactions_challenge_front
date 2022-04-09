@@ -1,8 +1,8 @@
 import gql from 'graphql-tag'
 
-export const getAllTransactions = gql`
-  query getAllTransactions {
-    getAllTransactions {
+export const getTransactionById = gql`
+  query getTransactionById($id: ID!) {
+    getTransactionById(id: $id) {
       id
       account
       description
@@ -12,6 +12,8 @@ export const getAllTransactions = gql`
       amount
       status
       transactionDate
+      createdAt
+      updatedAt
     }
   }
 `

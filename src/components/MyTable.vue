@@ -48,7 +48,6 @@
               </div>
             </td>
           </tr>
-          <!-- TODO botar isso centralizado no meio do tbody -->
           <div v-if="!data.length" class="flex text-center justify-center w-full">
             <slot name="noPageView" class="w-max">
               {{ emptyMessage }}
@@ -83,7 +82,6 @@ export default defineComponent({
     color: {
       default: 'light',
       validator(value: string) {
-        // The value must match one of these strings
         return ['light', 'dark'].indexOf(value) !== -1
       },
     },

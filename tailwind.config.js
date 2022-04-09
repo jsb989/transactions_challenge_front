@@ -1,3 +1,7 @@
+const typography = require('@tailwindcss/typography')
+const aspectratio = require('@tailwindcss/aspect-ratio')
+const forms = require('@tailwindcss/forms')
+
 module.exports = {
   content: [
     "./index.html",
@@ -6,9 +10,9 @@ module.exports = {
   theme: {
     extend: {
       colors: {
-        imobanco: '#002c5f',
+        azul: '#002c5f',
       }
     }
   },
-  plugins: [],
+  plugins: [forms, typography, aspectratio],
 }
