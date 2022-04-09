@@ -14,7 +14,7 @@
             label="De"
             type="date"
             class="h-10 px-3 bg-gray-100 placeholder-gray-600 border-azul rounded-lg focus:ring-azul focus:border-azul"
-            v-model="start"
+            v-model.startDate="variables.startDate"
           />
           <label class="mr-2 ml-2 pt-1 text-sm">Até</label>
           <input
@@ -22,12 +22,12 @@
             id="periodTo-created_at__lte"
             class="h-10 px-3 bg-gray-100 placeholder-gray-600 border-azul rounded-lg focus:ring-azul focus:border-azul"
             label="Até"
-            v-model="end"
+            v-model.endDate="variables.endDate"
           />
         </div>
       </div>
       <button
-        @click="filterTransactionsByDate(start, end)"
+        @click="refetch"
         type="button"
         class="px-3 ml-1 h-10 text-center bg-azul rounded-lg text-white text-sm hover:bg-blue-900"
       >
@@ -35,7 +35,7 @@
       </button>
     </div>
 
-    <MyTable :fields="fields" :data="transactions" stripped :key="redraw.value">
+    <MyTable :fields="fields" :data="transactions" stripped>
       <template #cell(transactionDate)="{ item }">
         {{ item.transactionDate.split('T')[0] }}
       </template>
@@ -53,11 +53,10 @@
 </template>
 
 <script lang="ts">
-import { defineComponent, ref } from 'vue'
+import { computed, defineComponent, ref, reactive } from 'vue'
 import MyTable from '../components/MyTable.vue'
-import { apolloClient } from '../graphql/client'
-import { useQuery, useLazyQuery, useResult } from '@vue/apollo-composable'
-import { getAllTransactions } from '../graphql/queries/getAllTransactions'
+import { Transactions } from '../models/transactions'
+import { useQuery, useResult } from '@vue/apollo-composable'
 import { getTransactionsByDate } from '../graphql/queries/getTransactionsByDate'
 
 export default defineComponent({
@@ -66,9 +65,6 @@ export default defineComponent({
     MyTable,
   },
   setup() {
-    const { result, loading } = useQuery(getAllTransactions)
-    // console.log(result)
-    let transactions = ref(useResult(result, null, data => data.getAllTransactions))
     const fields = [
       { key: 'account', label: 'account' },
       { key: 'description', label: 'description' },
@@ -80,25 +76,19 @@ export default defineComponent({
       { key: 'transactionDate', label: 'transaction date' },
       { key: 'actions', label: '' },
     ]
-    let start = ''
-    let end = ''
-    let redraw = ref(0)
+    
+    const variables = reactive({
+      startDate: '',
+      endDate: ''
+    })
 
-    async function filterTransactionsByDate(startDate: string, endDate: string) {
-      console.log(startDate, endDate)
-      const result = await apolloClient.query({
-        query: getTransactionsByDate,
-        variables: {
-          startDate,
-          endDate,
-        }
-      })
-      redraw.value++
-      transactions = useResult(result.data)
-      console.log(transactions)
-    }
-    console.log(transactions)
-    return { transactions, loading, fields, start, end, redraw, filterTransactionsByDate}
+    const { result, loading, refetch } = useQuery(getTransactionsByDate, variables)
+
+    const transactions = computed((): Array<Transactions> => {
+      return result.value?.getTransactionsByDate || [];
+    });
+
+    return { transactions, loading, fields, refetch, variables }
   },
   methods: {
     enterDetails(item: any) {
