@@ -10,8 +10,10 @@
   "dependencies": {
     "@apollo/client": "^3.3.7",
     "@vue/apollo-composable": "^4.0.0-alpha.12",
+    "@vuepic/vue-datepicker": "^3.0.0",
     "graphql": "^15.4.0",
     "graphql-tag": "^2.11.0",
+    "moment": "^2.29.2",
     "vue": "^3.2.25",
     "vue-router": "4"
   },

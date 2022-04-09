@@ -6,33 +6,15 @@
     <div class="flex flex-wrap space-y-4 md:space-y-0">
       <!-- Inicio do Filtro de Criação -->
       <div class="w-full xl:w-1/3 mb-4">
-        <label class="mr-2 pt-1 text-sm">Data:</label>
-        <div>
-          <label class="mr-2 pt-1 text-sm">Start</label>
-          <input
-            id="periodFrom-created_at__gte"
-            label="De"
-            type="date"
-            class="h-10 px-3 bg-gray-100 placeholder-gray-600 border-azul rounded-lg focus:ring-azul focus:border-azul"
-            v-model.startDate="variables.startDate"
-          />
-          <label class="mr-2 ml-2 pt-1 text-sm">Até</label>
-          <input
-            type="date"
-            id="periodTo-created_at__lte"
-            class="h-10 px-3 bg-gray-100 placeholder-gray-600 border-azul rounded-lg focus:ring-azul focus:border-azul"
-            label="Até"
-            v-model.endDate="variables.endDate"
-          />
-        </div>
+        <Datepicker 
+          v-model="date" 
+          @update:modelValue="onChangeDatePicker" 
+          range 
+          :partialRange="false"
+          :enableTimePicker="false"
+        />
+        
       </div>
-      <button
-        @click="refetch"
-        type="button"
-        class="px-3 ml-1 h-10 text-center bg-azul rounded-lg text-white text-sm hover:bg-blue-900"
-      >
-        Filtrar
-      </button>
     </div>
 
     <MyTable :fields="fields" :data="transactions" stripped>
@@ -53,16 +35,19 @@
 </template>
 
 <script lang="ts">
-import { computed, defineComponent, ref, reactive } from 'vue'
+import { computed, onMounted, defineComponent, ref, reactive } from 'vue'
 import MyTable from '../components/MyTable.vue'
+import Datepicker from '@vuepic/vue-datepicker';
+import '@vuepic/vue-datepicker/dist/main.css'
 import { Transactions } from '../models/transactions'
-import { useQuery, useResult } from '@vue/apollo-composable'
+import { useQuery } from '@vue/apollo-composable'
 import { getTransactionsByDate } from '../graphql/queries/getTransactionsByDate'
 
 export default defineComponent({
   name: 'App',
   components: {
     MyTable,
+    Datepicker,
   },
   setup() {
     const fields = [
@@ -77,6 +62,7 @@ export default defineComponent({
       { key: 'actions', label: '' },
     ]
     
+
     const variables = reactive({
       startDate: '',
       endDate: ''
@@ -84,11 +70,24 @@ export default defineComponent({
 
     const { result, loading, refetch } = useQuery(getTransactionsByDate, variables)
 
+    const date = ref()
+
+    onMounted(() => {
+      const startDate = new Date();
+      const endDate = new Date(new Date().setDate(startDate.getDate() + 7));
+      date.value = [startDate, endDate];
+    })
+
+    const onChangeDatePicker = (value: Date[]): void => {
+      variables.startDate = value[0].toISOString().split('T')[0]
+      variables.endDate = value[1].toISOString().split('T')[0]
+    };
+
     const transactions = computed((): Array<Transactions> => {
       return result.value?.getTransactionsByDate || [];
     });
 
-    return { transactions, loading, fields, refetch, variables }
+    return { transactions, loading, fields, refetch, date, onChangeDatePicker}
   },
   methods: {
     enterDetails(item: any) {
