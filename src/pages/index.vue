@@ -2,8 +2,8 @@
   <div v-if="loading" class="mx-4">
     Loading data
   </div>
-  <div v-else>
-    <div class="flex flex-wrap space-y-4 md:space-y-0">
+  <div v-else class="mx-4">
+    <div class="flex flex-wrap space-y-4 md:space-y-0 items-center justify-center">
       <!-- Inicio do Filtro de Criação -->
       <div class="w-full xl:w-1/3 mb-4">
         <Datepicker 
