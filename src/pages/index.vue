@@ -73,8 +73,8 @@ export default defineComponent({
     const date = ref()
 
     onMounted(() => {
-      const startDate = new Date();
-      const endDate = new Date(new Date().setDate(startDate.getDate() + 7));
+      const startDate = '';
+      const endDate = '';
       date.value = [startDate, endDate];
     })
 
